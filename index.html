@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekap Presensi Dosen - Gizi dan Dietetika</title>
     
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- SheetJS (XLSX) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- GANTI: xlsx-js-style untuk dukungan styling penuh -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     
     <style>
         :root {
@@ -38,143 +34,94 @@
             color: var(--brand-text);
             padding: 24px 0;
         }
+        .app-container { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
 
-        .app-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        /* HEADER CARD */
         .header-card {
             background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
-            border-radius: 20px;
-            padding: 32px;
-            color: #fff;
+            border-radius: 20px; padding: 32px; color: #fff;
             box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.4);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 24px;
+            position: relative; overflow: hidden; margin-bottom: 24px;
         }
         .header-card::before {
-            content: '';
-            position: absolute;
-            top: -50%; right: -10%;
+            content: ''; position: absolute; top: -50%; right: -10%;
             width: 400px; height: 400px;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
             border-radius: 50%;
         }
         .header-card::after {
-            content: '';
-            position: absolute;
-            bottom: -60%; left: -5%;
+            content: ''; position: absolute; bottom: -60%; left: -5%;
             width: 300px; height: 300px;
             background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
             border-radius: 50%;
         }
         .header-content { position: relative; z-index: 1; }
-        .header-card h1 {
-            font-size: 1.75rem; font-weight: 700;
-            margin: 0 0 6px 0;
-            letter-spacing: -0.02em;
-        }
+        .header-card h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.02em; }
         .header-card p { margin: 0; opacity: 0.9; font-size: 0.95rem; }
         .header-badge {
             display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.18);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.18); backdrop-filter: blur(10px);
             padding: 6px 14px; border-radius: 50px;
-            font-size: 0.8rem; font-weight: 500;
-            margin-bottom: 14px;
+            font-size: 0.8rem; font-weight: 500; margin-bottom: 14px;
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* MAIN CARD */
         .main-card {
-            background: var(--brand-surface);
-            border-radius: 20px;
+            background: var(--brand-surface); border-radius: 20px;
             box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.08);
-            border: 1px solid var(--brand-border);
-            overflow: hidden;
+            border: 1px solid var(--brand-border); overflow: hidden;
         }
 
         .toolbar {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--brand-border);
+            padding: 20px 24px; border-bottom: 1px solid var(--brand-border);
             display: flex; flex-wrap: wrap; gap: 12px;
             align-items: center; justify-content: space-between;
             background: #fafbfc;
         }
 
-        .search-wrapper {
-            position: relative; flex: 1;
-            max-width: 420px; min-width: 200px;
-        }
+        .search-wrapper { position: relative; flex: 1; max-width: 420px; min-width: 200px; }
         .search-wrapper i {
-            position: absolute; left: 14px; top: 50%;
-            transform: translateY(-50%);
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
             color: var(--brand-muted); font-size: 1rem;
         }
         .search-wrapper input {
-            width: 100%;
-            padding: 10px 14px 10px 42px;
-            border: 1px solid var(--brand-border);
-            border-radius: 10px; font-size: 0.9rem;
-            background: #fff; transition: all 0.2s; outline: none;
+            width: 100%; padding: 10px 14px 10px 42px;
+            border: 1px solid var(--brand-border); border-radius: 10px;
+            font-size: 0.9rem; background: #fff; transition: all 0.2s; outline: none;
         }
         .search-wrapper input:focus {
             border-color: var(--brand-primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        /* BUTTONS */
         .btn-elegant {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 10px 20px; border-radius: 10px;
-            font-size: 0.9rem; font-weight: 600;
-            border: none; cursor: pointer;
-            transition: all 0.2s; text-decoration: none;
+            font-size: 0.9rem; font-weight: 600; border: none;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
         }
         .btn-elegant:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-upload {
             background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.4);
+            color: #fff; box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.4);
         }
-        .btn-upload:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.5);
-        }
+        .btn-upload:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.5); }
         .btn-export {
             background: linear-gradient(135deg, var(--brand-success) 0%, #059669 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.4);
+            color: #fff; box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.4);
         }
-        .btn-export:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px -2px rgba(16, 185, 129, 0.5);
-        }
+        .btn-export:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px -2px rgba(16, 185, 129, 0.5); }
 
-        /* TABLE */
-        .table-wrapper {
-            max-height: 620px; overflow: auto; position: relative;
-        }
-        .table {
-            margin: 0; font-size: 0.875rem;
-            border-collapse: separate; border-spacing: 0;
-        }
+        .table-wrapper { max-height: 620px; overflow: auto; position: relative; }
+        .table { margin: 0; font-size: 0.875rem; border-collapse: separate; border-spacing: 0; }
         .table thead th {
-            position: sticky; top: 0;
-            background: #f1f5f9; color: var(--brand-text);
-            font-weight: 600; font-size: 0.75rem;
-            text-transform: uppercase; letter-spacing: 0.05em;
-            padding: 14px 16px;
+            position: sticky; top: 0; background: #f1f5f9; color: var(--brand-text);
+            font-weight: 600; font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 0.05em; padding: 14px 16px;
             border-bottom: 1px solid var(--brand-border);
             z-index: 5; white-space: nowrap;
         }
         .table tbody td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--brand-border);
+            padding: 14px 16px; border-bottom: 1px solid var(--brand-border);
             vertical-align: middle;
         }
         .table tbody tr { transition: background 0.15s; }
@@ -182,12 +129,10 @@
         .table tbody tr.group-start td { border-top: 2px solid var(--brand-primary); }
 
         .class-badge {
-            display: inline-block;
-            padding: 4px 12px;
+            display: inline-block; padding: 4px 12px;
             background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
-            color: var(--brand-primary);
-            font-weight: 700; font-size: 0.75rem;
-            border-radius: 6px; letter-spacing: 0.03em;
+            color: var(--brand-primary); font-weight: 700;
+            font-size: 0.75rem; border-radius: 6px; letter-spacing: 0.03em;
         }
         .course-name { font-weight: 600; color: var(--brand-text); }
         .percent-cell { font-weight: 600; color: var(--brand-primary); }
@@ -197,33 +142,21 @@
             text-align: center; font-size: 0.95rem;
         }
 
-        /* EMPTY STATE */
         .empty-state { padding: 80px 20px; text-align: center; }
         .empty-icon {
             width: 80px; height: 80px; margin: 0 auto 20px;
             background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-            border-radius: 24px;
-            display: flex; align-items: center; justify-content: center;
+            border-radius: 24px; display: flex;
+            align-items: center; justify-content: center;
             color: var(--brand-primary); font-size: 2rem;
         }
-        .empty-state h5 {
-            color: var(--brand-text); font-weight: 600; margin-bottom: 8px;
-        }
-        .empty-state p {
-            color: var(--brand-muted); font-size: 0.9rem; margin: 0;
-        }
+        .empty-state h5 { color: var(--brand-text); font-weight: 600; margin-bottom: 8px; }
+        .empty-state p { color: var(--brand-muted); font-size: 0.9rem; margin: 0; }
 
-        /* MODAL */
-        .modal-content {
-            border: none; border-radius: 20px; overflow: hidden;
-            box-shadow: 0 20px 60px -20px rgba(15, 23, 42, 0.3);
-        }
-        .modal-header {
-            border: none; padding: 24px 28px 0;
-        }
+        .modal-content { border: none; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px -20px rgba(15, 23, 42, 0.3); }
+        .modal-header { border: none; padding: 24px 28px 0; }
         .modal-header .modal-title {
-            font-weight: 700; font-size: 1.15rem;
-            color: var(--brand-text);
+            font-weight: 700; font-size: 1.15rem; color: var(--brand-text);
             display: flex; align-items: center; gap: 10px;
         }
         .modal-icon-wrap {
@@ -231,89 +164,55 @@
             display: flex; align-items: center; justify-content: center;
             color: #fff; font-size: 1.1rem;
         }
-        .modal-icon-primary {
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
-        }
-        .modal-icon-success {
-            background: linear-gradient(135deg, var(--brand-success) 0%, #059669 100%);
-        }
+        .modal-icon-primary { background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%); }
         .modal-body { padding: 20px 28px 24px; }
-        .modal-footer {
-            border: none; padding: 0 28px 24px; gap: 10px;
-        }
+        .modal-footer { border: none; padding: 0 28px 24px; gap: 10px; }
 
-        /* UPLOAD ZONE */
         .upload-zone {
-            border: 2px dashed var(--brand-border);
-            border-radius: 14px;
-            padding: 36px 24px; text-align: center;
-            cursor: pointer; transition: all 0.2s;
-            background: #fafbfc;
+            border: 2px dashed var(--brand-border); border-radius: 14px;
+            padding: 36px 24px; text-align: center; cursor: pointer;
+            transition: all 0.2s; background: #fafbfc;
         }
-        .upload-zone:hover {
-            border-color: var(--brand-primary); background: #f5f3ff;
-        }
-        .upload-zone.dragover {
-            border-color: var(--brand-primary);
-            background: #eef2ff; transform: scale(1.01);
-        }
-        .upload-zone.has-file {
-            border-color: var(--brand-success);
-            background: #f0fdf4; border-style: solid;
-        }
-        .upload-zone-icon {
-            font-size: 2.5rem; color: var(--brand-primary); margin-bottom: 12px;
-        }
-        .upload-zone-title {
-            font-weight: 600; color: var(--brand-text); margin-bottom: 4px;
-        }
-        .upload-zone-subtitle {
-            color: var(--brand-muted); font-size: 0.85rem;
-        }
+        .upload-zone:hover { border-color: var(--brand-primary); background: #f5f3ff; }
+        .upload-zone.dragover { border-color: var(--brand-primary); background: #eef2ff; transform: scale(1.01); }
+        .upload-zone.has-file { border-color: var(--brand-success); background: #f0fdf4; border-style: solid; }
+        .upload-zone-icon { font-size: 2.5rem; color: var(--brand-primary); margin-bottom: 12px; }
+        .upload-zone-title { font-weight: 600; color: var(--brand-text); margin-bottom: 4px; }
+        .upload-zone-subtitle { color: var(--brand-muted); font-size: 0.85rem; }
 
         .file-info {
             display: none; align-items: center; gap: 12px;
-            padding: 12px 16px; background: #fff;
-            border-radius: 10px; margin-top: 16px;
-            border: 1px solid var(--brand-border);
+            padding: 12px 16px; background: #fff; border-radius: 10px;
+            margin-top: 16px; border: 1px solid var(--brand-border);
         }
         .file-info.show { display: flex; }
         .file-info-icon {
             width: 40px; height: 40px;
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: #d97706; font-size: 1.2rem;
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; color: #d97706; font-size: 1.2rem;
         }
         .file-info-detail { flex: 1; text-align: left; }
-        .file-info-name {
-            font-weight: 600; font-size: 0.9rem;
-            color: var(--brand-text); word-break: break-all;
-        }
+        .file-info-name { font-weight: 600; font-size: 0.9rem; color: var(--brand-text); word-break: break-all; }
         .file-info-size { font-size: 0.8rem; color: var(--brand-muted); }
 
-        .btn-cancel {
-            background: #f1f5f9; color: var(--brand-text);
-        }
+        .btn-cancel { background: #f1f5f9; color: var(--brand-text); }
         .btn-cancel:hover { background: #e2e8f0; }
 
-        /* PROGRESS */
         .progress-elegant {
-            height: 6px; border-radius: 10px;
-            background: #f1f5f9; overflow: hidden; margin-top: 16px;
+            height: 6px; border-radius: 10px; background: #f1f5f9;
+            overflow: hidden; margin-top: 16px;
         }
         .progress-elegant .progress-bar {
             background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
             transition: width 0.3s ease;
         }
 
-        /* SUCCESS */
         .success-checkmark {
             width: 72px; height: 72px; margin: 0 auto 20px;
             background: linear-gradient(135deg, var(--brand-success) 0%, #059669 100%);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 2.2rem;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; color: #fff; font-size: 2.2rem;
             animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.6);
         }
@@ -321,30 +220,13 @@
             0% { transform: scale(0); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .summary-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 10px; margin-top: 20px;
-        }
-        .summary-item {
-            padding: 14px; background: #f8fafc;
-            border-radius: 12px; text-align: center;
-            border: 1px solid var(--brand-border);
-        }
-        .summary-value {
-            font-size: 1.4rem; font-weight: 700;
-            color: var(--brand-primary); line-height: 1.2;
-        }
-        .summary-label {
-            font-size: 0.7rem; color: var(--brand-muted);
-            text-transform: uppercase; letter-spacing: 0.05em;
-            margin-top: 4px; font-weight: 600;
-        }
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .summary-item { padding: 14px; background: #f8fafc; border-radius: 12px; text-align: center; border: 1px solid var(--brand-border); }
+        .summary-value { font-size: 1.4rem; font-weight: 700; color: var(--brand-primary); line-height: 1.2; }
+        .summary-label { font-size: 0.7rem; color: var(--brand-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; font-weight: 600; }
 
-        .status-text {
-            font-size: 0.85rem; color: var(--brand-muted); margin-left: 8px;
-        }
+        .status-text { font-size: 0.85rem; color: var(--brand-muted); margin-left: 8px; }
 
-        /* SCROLLBAR */
         .table-wrapper::-webkit-scrollbar { width: 8px; height: 8px; }
         .table-wrapper::-webkit-scrollbar-track { background: #f1f5f9; }
         .table-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -361,8 +243,6 @@
 <body>
 
 <div class="app-container">
-
-    <!-- HEADER -->
     <div class="header-card">
         <div class="header-content">
             <div class="header-badge">
@@ -374,7 +254,6 @@
         </div>
     </div>
 
-    <!-- MAIN CARD -->
     <div class="main-card">
         <div class="toolbar">
             <div class="search-wrapper">
@@ -408,7 +287,6 @@
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
-
             <div id="emptyState" class="empty-state">
                 <div class="empty-icon">
                     <i class="bi bi-file-earmark-pdf"></i>
@@ -436,17 +314,13 @@
             <div class="modal-body">
                 <div class="upload-zone" id="uploadZone">
                     <input type="file" id="pdfUpload" accept=".pdf" hidden>
-                    <div class="upload-zone-icon">
-                        <i class="bi bi-cloud-arrow-up"></i>
-                    </div>
+                    <div class="upload-zone-icon"><i class="bi bi-cloud-arrow-up"></i></div>
                     <div class="upload-zone-title">Klik untuk memilih file PDF</div>
                     <div class="upload-zone-subtitle">atau seret & letakkan file di sini (Max: 10MB)</div>
                 </div>
 
                 <div class="file-info" id="fileInfo">
-                    <div class="file-info-icon">
-                        <i class="bi bi-file-earmark-pdf-fill"></i>
-                    </div>
+                    <div class="file-info-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
                     <div class="file-info-detail">
                         <div class="file-info-name" id="fileName">-</div>
                         <div class="file-info-size" id="fileSize">-</div>
@@ -478,9 +352,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-body text-center pt-4">
-                <div class="success-checkmark">
-                    <i class="bi bi-check-lg"></i>
-                </div>
+                <div class="success-checkmark"><i class="bi bi-check-lg"></i></div>
                 <h5 class="fw-bold mb-2">Berhasil Diproses!</h5>
                 <p class="text-muted mb-0" style="font-size: 0.9rem;">
                     Data presensi dosen telah berhasil diekstraksi dari file PDF.
@@ -510,7 +382,6 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -532,18 +403,9 @@
     const progressWrap = document.getElementById('progressWrap');
     const progressBar = document.getElementById('progressBar');
 
-    // ==== Upload Zone Events ====
     uploadZone.addEventListener('click', () => pdfUpload.click());
-
-    uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('dragover');
-    });
-
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('dragover');
-    });
-
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
     uploadZone.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadZone.classList.remove('dragover');
@@ -552,20 +414,17 @@
             handleFileSelect();
         }
     });
-
     pdfUpload.addEventListener('change', handleFileSelect);
 
     function handleFileSelect() {
         if (pdfUpload.files.length === 0) return;
         const file = pdfUpload.files[0];
-        
         if (file.type !== 'application/pdf') {
             uploadStatus.textContent = "Format file harus PDF!";
             uploadStatus.style.color = '#dc2626';
             clearFile();
             return;
         }
-
         uploadZone.classList.add('has-file');
         fileInfo.classList.add('show');
         fileName.textContent = file.name;
@@ -585,10 +444,8 @@
         progressBar.style.width = '0%';
     }
 
-    // ==== Process PDF ====
     async function processPDF() {
         if (pdfUpload.files.length === 0) return;
-
         const file = pdfUpload.files[0];
         processBtn.disabled = true;
         uploadStatus.textContent = "Membaca file PDF...";
@@ -599,7 +456,6 @@
         try {
             const arrayBuffer = await file.arrayBuffer();
             progressBar.style.width = '30%';
-            
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             let fullText = "";
 
@@ -614,9 +470,7 @@
             uploadStatus.textContent = "Mengekstrak data...";
             const parsedData = parsePDFText(fullText);
 
-            if (parsedData.length === 0) {
-                throw new Error("Format PDF tidak dikenali atau tidak ada data presensi.");
-            }
+            if (parsedData.length === 0) throw new Error("Format PDF tidak dikenali atau tidak ada data presensi.");
 
             globalData = parsedData;
             renderTable(globalData);
@@ -641,18 +495,14 @@
     function showSuccessModal() {
         const uniqueCourses = new Set(globalData.map(d => d.mataKuliah)).size;
         const uniqueClasses = new Set(globalData.map(d => d.kelas)).size;
-        
         document.getElementById('summaryRows').textContent = globalData.length;
         document.getElementById('summaryCourses').textContent = uniqueCourses;
         document.getElementById('summaryClasses').textContent = uniqueClasses;
-        
         successModal.show();
     }
 
-    // ==== Parsing PDF ====
     function parsePDFText(text) {
         const data = [];
-        
         const courseRegex = /Mata Kuliah\s*:\s*(.*?)(?=\s*(?:Nama|Kelas|Tgl|Prodi|SKS|Periode)|$)/gi;
         let courseMatches = [];
         let match;
@@ -675,23 +525,14 @@
         let rowMatch;
         while ((rowMatch = rowRegex.exec(text)) !== null) {
             const rowIndex = rowMatch.index;
-            
             let currentCourse = courseMatches[0].value;
             for (let i = courseMatches.length - 1; i >= 0; i--) {
-                if (courseMatches[i].index < rowIndex) {
-                    currentCourse = courseMatches[i].value;
-                    break;
-                }
+                if (courseMatches[i].index < rowIndex) { currentCourse = courseMatches[i].value; break; }
             }
-
             let currentClass = classMatches[0].value;
             for (let i = classMatches.length - 1; i >= 0; i--) {
-                if (classMatches[i].index < rowIndex) {
-                    currentClass = classMatches[i].value;
-                    break;
-                }
+                if (classMatches[i].index < rowIndex) { currentClass = classMatches[i].value; break; }
             }
-
             data.push({
                 mataKuliah: currentCourse,
                 kelas: currentClass,
@@ -709,20 +550,14 @@
             if (a.mataKuliah > b.mataKuliah) return 1;
             return 0;
         });
-
         return data;
     }
 
-    // ==== Render Table ====
     function renderTable(data) {
         const tableBody = document.getElementById('tableBody');
         const emptyState = document.getElementById('emptyState');
         tableBody.innerHTML = "";
-
-        if (data.length === 0) {
-            emptyState.style.display = 'block';
-            return;
-        }
+        if (data.length === 0) { emptyState.style.display = 'block'; return; }
         emptyState.style.display = 'none';
 
         const groupedData = {};
@@ -735,14 +570,12 @@
         Object.keys(groupedData).forEach(key => {
             const items = groupedData[key];
             const [mataKuliah, kelas] = key.split("|");
-            
             const totalPersen = items.reduce((sum, item) => sum + item.persen, 0);
             const rerata = (totalPersen / items.length).toFixed(2);
 
             items.forEach((item, itemIndex) => {
                 const tr = document.createElement("tr");
                 if (itemIndex === 0) tr.classList.add("group-start");
-
                 tr.innerHTML = `
                     <td><span class="course-name">${item.mataKuliah}</span></td>
                     <td><span class="class-badge">${item.kelas}</span></td>
@@ -757,11 +590,9 @@
         });
     }
 
-    // ==== Filter ====
     function filterTable() {
         const filter = document.getElementById('searchInput').value.toUpperCase();
         const tr = document.getElementById('attendanceTable').getElementsByTagName('tr');
-
         for (let i = 1; i < tr.length; i++) {
             const txtValue = tr[i].textContent || tr[i].innerText;
             tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
@@ -769,7 +600,7 @@
     }
 
     // ================================================================
-    // ==== EXPORT EXCEL (DIPERBAIKI) =================================
+    // ============ EXPORT EXCEL (DENGAN STYLING PENUH) ===============
     // ================================================================
     function exportToExcel() {
         if (globalData.length === 0) {
@@ -783,12 +614,20 @@
         exportBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses...';
 
         try {
-            // Baris header
+            // ========== 1. BUILD DATA (dengan Title, Subtitle, Header) ==========
             const wsData = [
-                ["Mata Kuliah", "Nama Kelas", "Nama Dosen", "Alfa", "Hadir", "%", "Rerata"]
+                ["REKAP PRESENSI DOSEN", "", "", "", "", "", ""],          // Row 0: Title
+                ["Program Studi Gizi dan Dietetika  |  Periode 2026 Ganjil", "", "", "", "", "", ""], // Row 1: Subtitle
+                ["", "", "", "", "", "", ""],                               // Row 2: Empty
+                ["MATA KULIAH", "NAMA KELAS", "NAMA DOSEN", "ALFA", "HADIR", "%", "RERATA"] // Row 3: Header
             ];
 
-            // Kelompokkan data
+            const merges = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Title
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } }  // Subtitle
+            ];
+
+            // Group data
             const groupedData = {};
             globalData.forEach(item => {
                 const key = `${item.mataKuliah}|${item.kelas}`;
@@ -796,17 +635,13 @@
                 groupedData[key].push(item);
             });
 
-            let currentIndex = 1; // Index pada wsData (0 = header)
-            const merges = [];
+            let currentIndex = 4; // Data mulai dari index 4 (Excel row 5)
+            const groupStartRows = new Set();
 
             Object.keys(groupedData).forEach(key => {
                 const items = groupedData[key];
-                const [mataKuliah, kelas] = key.split("|");
                 const startIndex = currentIndex;
-
-                // Hitung rerata
-                const totalPersen = items.reduce((sum, item) => sum + item.persen, 0);
-                const rerataValue = (totalPersen / items.length) / 100; // dalam desimal
+                groupStartRows.add(startIndex);
 
                 // Push baris data
                 items.forEach(item => {
@@ -816,78 +651,170 @@
                         item.nama,
                         item.alfa,
                         item.hadir,
-                        item.persen / 100, // desimal untuk format %
-                        null               // kolom Rerata diisi setelah ini
+                        item.persen / 100,  // desimal (untuk format persen)
+                        null                // Rerata diisi setelah ini
                     ]);
                     currentIndex++;
                 });
 
                 const endIndex = currentIndex - 1;
 
-                // Excel row number = index wsData + 1 (karena 0-based)
-                // Formula range: dari baris data pertama sampai terakhir
+                // Excel row number (1-based): index + 1
                 const excelStartRow = startIndex + 1;
                 const excelEndRow = endIndex + 1;
                 const formula = `AVERAGE(F${excelStartRow}:F${excelEndRow})`;
 
-                // >>> PERBAIKAN UTAMA <<<
-                // Formula ditulis HANYA di sel pertama (top-left dari merge)
-                // wsData[startIndex][6] = sel top-left
+                const totalPersen = items.reduce((sum, item) => sum + item.persen, 0);
+                const rerataValue = (totalPersen / items.length) / 100;
+
+                // Formula di sel pertama grup
                 wsData[startIndex][6] = {
                     f: formula,
-                    v: rerataValue,  // nilai cache agar langsung tampil di Excel
-                    t: 'n',          // tipe number
-                    z: '0.00%'       // format persen
+                    v: rerataValue,
+                    t: 'n',
+                    z: '0.00%'
                 };
 
-                // Merge cells untuk kolom Rerata jika lebih dari 1 dosen
+                // Merge kolom Rerata
                 if (items.length > 1) {
                     merges.push({
-                        s: { r: startIndex, c: 6 },  // start row/col (0-based)
-                        e: { r: endIndex, c: 6 }     // end row/col (0-based)
+                        s: { r: startIndex, c: 6 },
+                        e: { r: endIndex, c: 6 }
                     });
                 }
             });
 
-            // Buat worksheet
+            // ========== 2. CREATE WORKSHEET ==========
             const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!merges'] = merges;
 
-            // Terapkan merge cells
-            if (merges.length > 0) {
-                ws['!merges'] = merges;
-            }
-
-            // Set lebar kolom
+            // Lebar kolom
             ws['!cols'] = [
                 { wch: 45 }, // Mata Kuliah
-                { wch: 12 }, // Nama Kelas
-                { wch: 40 }, // Nama Dosen
+                { wch: 13 }, // Nama Kelas
+                { wch: 42 }, // Nama Dosen
                 { wch: 8 },  // Alfa
                 { wch: 8 },  // Hadir
-                { wch: 10 }, // %
-                { wch: 10 }  // Rerata
+                { wch: 11 }, // %
+                { wch: 12 }  // Rerata
             ];
 
-            // Terapkan format persen ke kolom F (index 5) untuk semua baris data
+            // Row height
             const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let R = range.s.r + 1; R <= range.e.r; ++R) {
-                const cellRef = XLSX.utils.encode_cell({ c: 5, r: R });
-                if (ws[cellRef]) {
-                    ws[cellRef].z = '0.00%';
+            const rowHeights = [
+                { hpt: 36 }, // Title
+                { hpt: 22 }, // Subtitle
+                { hpt: 8 },  // Empty
+                { hpt: 28 }  // Header
+            ];
+            for (let r = 4; r <= range.e.r; r++) {
+                rowHeights.push({ hpt: 22 });
+            }
+            ws['!rows'] = rowHeights;
+
+            // ========== 3. STYLING ==========
+            // Border tipis untuk data
+            const borderThin = {
+                top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+                bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+                left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+                right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+            };
+            // Border atas tebal (untuk awal grup)
+            const borderGroupTop = {
+                top: { style: 'medium', color: { rgb: '4F46E5' } },
+                bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+                left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+                right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+            };
+            // Border header
+            const borderHeader = {
+                top: { style: 'medium', color: { rgb: '4F46E5' } },
+                bottom: { style: 'medium', color: { rgb: '4F46E5' } },
+                left: { style: 'thin', color: { rgb: 'FFFFFF' } },
+                right: { style: 'thin', color: { rgb: 'FFFFFF' } }
+            };
+
+            // ---- Title (A1) ----
+            ws['A1'].s = {
+                font: { name: 'Calibri', sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                fill: { fgColor: { rgb: '4F46E5' } },
+                alignment: { horizontal: 'center', vertical: 'center' }
+            };
+
+            // ---- Subtitle (A2) ----
+            ws['A2'].s = {
+                font: { name: 'Calibri', sz: 11, italic: true, color: { rgb: 'FFFFFF' } },
+                fill: { fgColor: { rgb: '4F46E5' } },
+                alignment: { horizontal: 'center', vertical: 'center' }
+            };
+
+            // ---- Header Row (Excel row 4 = index 3) ----
+            for (let c = 0; c <= 6; c++) {
+                const cellRef = XLSX.utils.encode_cell({ r: 3, c: c });
+                if (!ws[cellRef]) ws[cellRef] = { v: '', t: 's' };
+                ws[cellRef].s = {
+                    font: { name: 'Calibri', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+                    fill: { fgColor: { rgb: '4F46E5' } },
+                    alignment: { horizontal: 'center', vertical: 'center' },
+                    border: borderHeader
+                };
+            }
+
+            // ---- Data Rows ----
+            for (let r = 4; r <= range.e.r; r++) {
+                const isGroupStart = groupStartRows.has(r);
+                const borderStyle = isGroupStart ? borderGroupTop : borderThin;
+
+                for (let c = 0; c <= 6; c++) {
+                    const cellRef = XLSX.utils.encode_cell({ r: r, c: c });
+                    if (!ws[cellRef]) ws[cellRef] = { v: '', t: 's' };
+                    const cell = ws[cellRef];
+
+                    // Default alignment
+                    let align = 'left';
+                    if (c === 1 || c === 3 || c === 4 || c === 5 || c === 6) align = 'center';
+
+                    // Default style
+                    cell.s = {
+                        font: { name: 'Calibri', sz: 10, color: { rgb: '1E293B' } },
+                        alignment: { horizontal: align, vertical: 'center', wrapText: (c === 0 || c === 2) },
+                        border: borderStyle
+                    };
+
+                    // Kolom 1 - Nama Kelas: lilac bg, indigo bold
+                    if (c === 1) {
+                        cell.s.font = { name: 'Calibri', sz: 10, bold: true, color: { rgb: '4F46E5' } };
+                        cell.s.fill = { fgColor: { rgb: 'EEF2FF' } };
+                    }
+
+                    // Kolom 5 - Persen: indigo bold
+                    if (c === 5) {
+                        cell.s.font = { name: 'Calibri', sz: 10, bold: true, color: { rgb: '4F46E5' } };
+                        cell.z = '0.00%';
+                    }
+
+                    // Kolom 6 - Rerata: lilac bg, indigo bold besar
+                    if (c === 6) {
+                        cell.s.font = { name: 'Calibri', sz: 12, bold: true, color: { rgb: '4F46E5' } };
+                        cell.s.fill = { fgColor: { rgb: 'E0E7FF' } };
+                        cell.z = '0.00%';
+                    }
+
+                    // Kolom 0 - Mata Kuliah: bold
+                    if (c === 0) {
+                        cell.s.font = { name: 'Calibri', sz: 10, bold: true, color: { rgb: '1E293B' } };
+                    }
                 }
             }
 
-            // Buat workbook dan simpan
+            // ========== 4. CREATE WORKBOOK & SAVE ==========
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Rekap Presensi");
 
-            // Generate nama file dengan tanggal
             const today = new Date().toISOString().slice(0, 10);
-            const filename = `Rekap_Presensi_Dosen_${today}.xlsx`;
+            XLSX.writeFile(wb, `Rekap_Presensi_Dosen_${today}.xlsx`);
 
-            XLSX.writeFile(wb, filename);
-
-            // Restore tombol
             setTimeout(() => {
                 exportBtn.disabled = false;
                 exportBtn.innerHTML = originalContent;
